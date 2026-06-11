@@ -27,6 +27,11 @@
       "assessment_report.pdf p19 (cl 4.6 states max height 30.48m; permitted 26.4m incl 20% bonus)"
     ]
   },
+  "dcp_facts": {
+    "building_length_m": 52.3,
+    "building_length_source": "assessment_report.pdf p57 (Building A length 52.3m)",
+    "site_coverage_note": "Council disputes the applicant's site coverage and deep soil calculations (assessment_report.pdf p11); increase of +134.5 m2 over approved (p12)."
+  },
   "submissions_summary": [
     {"theme": "Traffic generation and road network impacts", "count": 1,
      "head_of_consideration": "4.15(1)(b) likely impacts — traffic",

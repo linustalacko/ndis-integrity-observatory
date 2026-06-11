@@ -107,7 +107,65 @@ def evaluate_seed(seed: dict) -> list[ComplianceFinding]:
         citation=cite("s19 minimum landscaped area", f"{report} p17"),
     ))
 
+    findings.extend(dcp_findings(seed))
     return findings
+
+
+DCP_PDF = "data/dcp/kdcp-part7-rfb.pdf"
+
+
+def dcp_findings(seed: dict) -> list[ComplianceFinding]:
+    """DCP controls table: deterministic where the proposal value is known,
+    otherwise complies=None routed to the planner, always citing the DCP section."""
+    from pathlib import Path
+
+    from .dcp import controls_for, load_chunks, numeric_controls
+
+    if not Path(DCP_PDF).exists():
+        return []
+    chunks = load_chunks(DCP_PDF)
+    dcp = seed["raw"].get("dcp_facts", {})
+    out: list[ComplianceFinding] = []
+
+    def cite(sec) -> Citation:
+        return Citation(claim=f"KDCP {sec.section} {sec.title}",
+                        source_type="dcp",
+                        source_ref=f"{DCP_PDF} {sec.section} p{sec.page}")
+
+    for sec in controls_for(chunks, ["7C.6"]):
+        length = dcp.get("building_length_m")
+        if length is not None:
+            ok = length <= 36.0
+            out.append(ComplianceFinding(
+                control=f"DCP {sec.section} — maximum building length",
+                requirement="Continuous length of a single building on any elevation <= 36 m",
+                proposed=f"{length} m ({dcp.get('building_length_source', 'proposal')})",
+                complies=ok,
+                breach_magnitude=None if ok else f"+{length - 36.0:.1f} m",
+                citation=cite(sec),
+            ))
+
+    for sec in controls_for(chunks, ["7A.5"]):
+        out.append(ComplianceFinding(
+            control=f"DCP {sec.section} — site coverage",
+            requirement="Maximum 30% of site area (subject to deep soil compliance)",
+            proposed=dcp.get("site_coverage_note", "[not extracted]"),
+            complies=None,
+            breach_magnitude=None,
+            citation=cite(sec),
+        ))
+
+    for sec in controls_for(chunks, ["7A.3", "7A.6", "7C.2"]):
+        nums = numeric_controls(sec)
+        out.append(ComplianceFinding(
+            control=f"DCP {sec.section} — {sec.title.title()}",
+            requirement=(nums[0] if nums else "see DCP section"),
+            proposed="[NEEDS PLANNER INPUT: measure from plans]",
+            complies=None,
+            breach_magnitude=None,
+            citation=cite(sec),
+        ))
+    return out
 
 
 def render_table(findings: list[ComplianceFinding]) -> str:
