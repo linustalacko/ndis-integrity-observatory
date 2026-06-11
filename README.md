@@ -20,8 +20,20 @@ planner decides; every factual claim is cited or flagged `[NEEDS PLANNER INPUT]`
   numeric/statutory issues recalled; qualitative ADG/design issues await the
   LLM + DCP retrieval stage).
   `uv run python -m app.report data/seeds/mcintyre` · `uv run python -m app.evaluate data/seeds/mcintyre`
-- **M3 ⏳** Generalised intake, SoEE/plan extraction, DCP retriever.
-- **M4 ⏳** LLM submissions clustering, three-pane UI, .docx export.
+- **M3 ✅** Generalised intake (any NSW address, verified on 74 Ridge Street,
+  Gordon → Lot A//DP328175, R2, 9.5 m / 0.3:1 / 930 m², matching the real GB.3
+  report); LEP Land Use Table parser + permissibility check (KLEP 2015 cached
+  in `data/lep/` — legislation.nsw.gov.au WAF blocks scripted fetch, captured
+  via browser); DCP retriever over KDCP Part 7 (residential flat buildings)
+  with section-aware chunking and a DCP compliance table (catches the 52.3 m
+  vs 36 m building-length breach the real report flags).
+  `uv run python -m app.dcp`
+- **M4 ✅ (no-LLM core)** Three-pane Streamlit demo with seed side-by-side
+  scorecard, editable draft, audit log, and .docx export.
+  `uv run streamlit run web/app.py` · `uv run python -m app.export`
+- **Next** LLM stages (needs `ANTHROPIC_API_KEY` + `app/llm.py`): SoEE/plan
+  vision extraction, qualitative ADG/design assessment (the 8 missed issues),
+  submissions clustering from pasted letters, prose polish of the draft.
 
 ## Seed case
 

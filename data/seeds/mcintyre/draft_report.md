@@ -18,7 +18,7 @@
 ## 2. Executive summary
 
 The application seeks consent for alterations, additions and associated works to an approved residential flat building (amending da to da0038/23) under sepp (housing) 2021. Assessment against the
-applicable planning controls identifies 3
+applicable planning controls identifies 4
 non-compliances with development standards (see Section 6). The draft recommendation is
 **refusal**. [NEEDS PLANNER INPUT: confirm executive summary emphasis]
 
@@ -45,11 +45,17 @@ Sources: assessment_report.pdf p1 (site area 3,360.1m2 by survey); assessment_re
 
 | Control | Requirement | Proposed | Complies | Breach | Source |
 |---|---|---|---|---|---|
+| Permissibility — Residential flat buildings in Zone R4 | Permitted with consent under the Land Use Table | Residential flat buildings | YES | — | https://legislation.nsw.gov.au/view/whole/html/inforce/current/epi-2015-0134 |
 | Floor Space Ratio | 2.2:1 (base; uplift only with qualifying affordable housing) | 2.71:1 (9114.1 m2 GFA / 3360.1 m2 site) | NO | +23.29% above base FSR | data/seeds/mcintyre/assessment_report.pdf p18 |
 | Affordable housing component (SEPP Housing s16(2)) | >= 10.0% of total GFA to access any FSR/height bonus | 9.6% (872.9 m2 of 9114.1 m2) | NO | 0.4 percentage points below minimum | data/seeds/mcintyre/assessment_report.pdf p18 |
 | Height of Building | 26.4 m (base 22.0 m incl 20% bonus) | 30.48 m (8 storeys) | NO | +4.08 m (15.5%) | data/seeds/mcintyre/assessment_report.pdf p19 |
 | Site area (SEPP Housing s19, non-discretionary) | >= 450.0 m2 | 3360.1 m2 | YES | — | data/seeds/mcintyre/assessment_report.pdf p17 |
 | Minimum landscaped area (SEPP Housing s19, non-discretionary) | >= 1008.0 m2 (lesser of 35m2/dwelling or 30% of site area) | 1572.0 m2 | YES | — | data/seeds/mcintyre/assessment_report.pdf p17 |
+| DCP 7C.6 — maximum building length | Continuous length of a single building on any elevation <= 36 m | 52.3 m (assessment_report.pdf p57 (Building A length 52.3m)) | NO | +16.3 m | data/dcp/kdcp-part7-rfb.pdf 7C.6 p32 |
+| DCP 7A.5 — site coverage | Maximum 30% of site area (subject to deep soil compliance) | Council disputes the applicant's site coverage and deep soil calculations (assessment_report.pdf p11); increase of +134.5 m2 over approved (p12). | REVIEW | — | data/dcp/kdcp-part7-rfb.pdf 7A.5 p15 |
+| DCP 7A.3 — Building Setbacks | side boundary street boundary driveway street min 6.0m side setback min 6.0m side setback | [NEEDS PLANNER INPUT: measure from plans] | REVIEW | — | data/dcp/kdcp-part7-rfb.pdf 7A.3 p10 |
+| DCP 7A.6 — Deep Soil Landscaping | Lots with the following sizes are to support a minimum number of tall trees capable of attaining a mature height of at least 18m on shale, transitional soils and 15m on sandstone derived soils. | [NEEDS PLANNER INPUT: measure from plans] | REVIEW | — | data/dcp/kdcp-part7-rfb.pdf 7A.6 p16 |
+| DCP 7C.2 — Communal Open Spa | At least 10% of the site area is to be provided as communal open space. Each parcel of communal open space is to have a minimum dimension of 5m. | [NEEDS PLANNER INPUT: measure from plans] | REVIEW | — | data/dcp/kdcp-part7-rfb.pdf 7C.2 p25 |
 
 ### DCP compliance
 
@@ -90,6 +96,7 @@ planning instruments. [NEEDS PLANNER INPUT: confirm]
 1. Floor Space Ratio does not comply: proposed 2.71:1 (9114.1 m2 GFA / 3360.1 m2 site) against a requirement of 2.2:1 (base; uplift only with qualifying affordable housing) (+23.29% above base FSR). Source: data/seeds/mcintyre/assessment_report.pdf p18.
 2. Affordable housing component (SEPP Housing s16(2)) does not comply: proposed 9.6% (872.9 m2 of 9114.1 m2) against a requirement of >= 10.0% of total GFA to access any FSR/height bonus (0.4 percentage points below minimum). Source: data/seeds/mcintyre/assessment_report.pdf p18.
 3. Height of Building does not comply: proposed 30.48 m (8 storeys) against a requirement of 26.4 m (base 22.0 m incl 20% bonus) (+4.08 m (15.5%)). Source: data/seeds/mcintyre/assessment_report.pdf p19.
+4. DCP 7C.6 — maximum building length does not comply: proposed 52.3 m (assessment_report.pdf p57 (Building A length 52.3m)) against a requirement of Continuous length of a single building on any elevation <= 36 m (+16.3 m). Source: data/dcp/kdcp-part7-rfb.pdf 7C.6 p32.
 
 ## 12. Conclusion
 
