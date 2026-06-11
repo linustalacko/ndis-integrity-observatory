@@ -17,7 +17,7 @@ def score(seed_dir: str) -> dict:
     gold = seed["raw"]["gold"]
     findings = evaluate_seed(seed)
     submissions = analyse_seed(seed)
-    draft = compose(seed, findings, submissions).lower()
+    draft = compose(seed, findings, submissions, seed_dir).lower()
     rec, _ = _recommendation(findings)
 
     # An issue counts as identified if any of its alias phrases appears in the draft.
@@ -25,6 +25,7 @@ def score(seed_dir: str) -> dict:
         "gross floor area": ["gross floor area", "floor space ratio", "gfa"],
         "building height": ["building height", "height of building"],
         "clause 4.6": ["clause 4.6", "cl 4.6", "4.6 variation", "exceptions to development standards"],
+        "services integration": ["services integration", "integration of services"],
     }
     def hit(issue: str) -> bool:
         return any(a in draft for a in aliases.get(issue, [issue.lower()]))

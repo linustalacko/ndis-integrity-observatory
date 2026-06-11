@@ -37,8 +37,25 @@ def _recommendation(findings: list[ComplianceFinding]) -> tuple[str, list[str]]:
     return "refusal", reasons
 
 
+def _qualitative_md(seed_dir) -> str:
+    """Render cached qualitative issues (app.impacts) if present."""
+    import json
+    from pathlib import Path
+    path = Path(seed_dir or "") / "qualitative_issues.json"
+    if not seed_dir or not path.exists():
+        return ""
+    issues = json.loads(path.read_text())
+    lines = ["### Design and amenity assessment (ADG / DCP topics — draft, planner to verify)\n"]
+    for i in issues:
+        flag = {"potential-issue": "⚠️ POTENTIAL ISSUE", "acceptable": "OK",
+                "needs-info": "NEEDS PLANNER INPUT"}.get(i["status"], i["status"])
+        q = f' Quote: "{i["quote"]}" ({i["source_ref"]})' if i.get("quote") else ""
+        lines.append(f"- **{i['theme']}** [{flag}] — {i['assessment']}{q}")
+    return "\n".join(lines)
+
+
 def compose(seed: dict, findings: list[ComplianceFinding],
-            submissions: list[SubmissionIssue]) -> str:
+            submissions: list[SubmissionIssue], seed_dir=None) -> str:
     case = seed["case"]
     p = seed["raw_proposal"]
     std = seed["effective_standards"]
@@ -112,7 +129,7 @@ Sources: {'; '.join(p['extracted_from'])}.
 
 {impacts_md}
 
-[NEEDS PLANNER INPUT: solar access, privacy, visual bulk, stormwater, ecology]
+{_qualitative_md(seed_dir) or '[NEEDS PLANNER INPUT: solar access, privacy, visual bulk, stormwater, ecology]'}
 
 ## 8. Section 4.15(1)(c) — suitability of the site
 
@@ -148,7 +165,7 @@ def main(argv: list[str]) -> int:
     seed = load_seed(seed_dir)
     findings = evaluate_seed(seed)
     submissions = analyse_seed(seed)
-    md = compose(seed, findings, submissions)
+    md = compose(seed, findings, submissions, seed_dir)
     out = Path(seed_dir) / "draft_report.md"
     out.write_text(md)
     print(md)

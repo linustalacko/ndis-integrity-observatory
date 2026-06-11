@@ -56,7 +56,7 @@ else:
     seed = load_seed(seed_dir)
     findings = evaluate_seed(seed)
     submissions = analyse_seed(seed)
-    draft = compose(seed, findings, submissions)
+    draft = compose(seed, findings, submissions, seed_dir)
 
     left, right = st.columns([3, 2])
     with left:

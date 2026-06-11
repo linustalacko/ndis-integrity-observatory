@@ -31,9 +31,18 @@ planner decides; every factual claim is cited or flagged `[NEEDS PLANNER INPUT]`
 - **M4 ✅ (no-LLM core)** Three-pane Streamlit demo with seed side-by-side
   scorecard, editable draft, audit log, and .docx export.
   `uv run streamlit run web/app.py` · `uv run python -m app.export`
-- **Next** LLM stages (needs `ANTHROPIC_API_KEY` + `app/llm.py`): SoEE/plan
-  vision extraction, qualitative ADG/design assessment (the 8 missed issues),
-  submissions clustering from pasted letters, prose polish of the draft.
+- **LLM stages ✅** (`app/llm.py`, OpenRouter key in `.env`, model override via
+  `DEN_LLM_MODEL`): qualitative ADG/DCP design assessment (`app/impacts.py`)
+  grounded in the applicant's own clause 4.6 request + DCP controls, with a
+  verifier that drops any claim whose quote isn't found verbatim in the inputs
+  — **issue recall now 14/14**, recommendation agreement maintained;
+  document extraction (`app.proposal.extract_from_text`) with per-field
+  evidence quotes and ungrounded-value nulling; submissions clustering with
+  PII redaction (`app.submissions.cluster_text`).
+  `uv run python -m app.impacts`
+- **Remaining stretch** plan-figure vision extraction from architectural
+  drawings; LLM prose polish of report sections; condition library;
+  multi-council DCP adapters.
 
 ## Seed case
 
