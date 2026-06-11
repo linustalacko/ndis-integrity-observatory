@@ -19,4 +19,4 @@ def load_seed(seed_dir: str | Path) -> dict:
     facts = ProposalFacts(**{k: v for k, v in p.items()
                              if k in ProposalFacts.model_fields})
     return {"case": data["case"], "proposal": facts, "raw_proposal": p,
-            "effective_standards": data["effective_standards"]}
+            "effective_standards": data["effective_standards"], "raw": data}
