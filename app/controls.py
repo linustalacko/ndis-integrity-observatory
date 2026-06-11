@@ -9,6 +9,7 @@ import json
 import sys
 
 from .arcgis import PRINCIPAL_PATH, query_point
+from .legislation import land_use_table
 from .models import Citation, Control, ControlsContext, PropertyContext
 from .property import resolve
 
@@ -52,6 +53,19 @@ def retrieve(prop: PropertyContext) -> ControlsContext:
             quote=f"SYM_CODE={ctx.zone_code}, LAY_CLASS={a.get('LAY_CLASS')}, "
                   f"currency {_date(a.get('CURRENCY_DATE'))}",
         ))
+
+    if ctx.lep_name and ctx.zone_code:
+        lut = land_use_table(ctx.lep_name, ctx.zone_code)
+        if lut:
+            ctx.permitted_uses = (lut["permitted_without_consent"]
+                                  + lut["permitted_with_consent"])
+            ctx.prohibited_uses = lut["prohibited"]
+            ctx.citations.append(Citation(
+                claim=f"Land Use Table for Zone {ctx.zone_code}: "
+                      f"{len(lut['permitted_with_consent'])} uses permitted with consent",
+                source_type="lep", source_ref=lut["source"],
+                quote="; ".join(lut["permitted_with_consent"][:6]) + " …",
+            ))
 
     for layer_id, name, field, unit, clause in STANDARD_LAYERS:
         feats, url = query_point(PRINCIPAL_PATH, layer_id, lon, lat)

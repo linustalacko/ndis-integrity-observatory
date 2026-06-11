@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import sys
 
+from .legislation import KNOWN_LEPS, is_permissible
 from .models import Citation, ComplianceFinding
 from .proposal import load_seed
 
@@ -28,6 +29,21 @@ def evaluate_seed(seed: dict) -> list[ComplianceFinding]:
         return Citation(claim=claim, source_type="document", source_ref=ref)
 
     site = p["site_area_m2"]
+
+    # Permissibility (Land Use Table)
+    lep = "Ku-ring-gai Local Environmental Plan 2015"
+    zone = std.get("zone_code", "R4")
+    use = std.get("land_use", "Residential flat buildings")
+    perm = is_permissible(lep, zone, use)
+    findings.append(ComplianceFinding(
+        control=f"Permissibility — {use} in Zone {zone}",
+        requirement="Permitted with consent under the Land Use Table",
+        proposed=use,
+        complies=perm,
+        breach_magnitude=None,
+        citation=Citation(claim=f"{use} permissibility in {zone}",
+                          source_type="lep", source_ref=KNOWN_LEPS[lep][1]),
+    ))
 
     # Floor space ratio (SEPP Housing s16 / KLEP cl 4.4 context)
     fsr_exact = p["gfa_m2"] / site
