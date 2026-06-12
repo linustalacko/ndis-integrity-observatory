@@ -44,10 +44,10 @@ phx = conn.execute("SELECT COUNT(DISTINCT action_id) c FROM matches "
 st.sidebar.metric("High-confidence phoenix leads", f"{phx:,}",
                   help="Rare-name, same-location ABNs activated after a sanction")
 
-(tab_overview, tab_check, tab_register, tab_phoenix, tab_typology, tab_diff,
- tab_claims) = st.tabs(
+(tab_overview, tab_check, tab_register, tab_phoenix, tab_dossier, tab_typology,
+ tab_diff, tab_claims) = st.tabs(
     ["Overview", "Provider check", "Register explorer", "Phoenix watch",
-     "Typologies", "Register diff", "Claims lab"])
+     "Lead dossiers", "Typologies", "Register diff", "Claims lab"])
 
 # ---------------------------------------------------------------- Overview
 with tab_overview:
@@ -199,6 +199,32 @@ with tab_phoenix:
     st.caption("Sources: NDIS Commission compliance register (data.gov.au) + "
                "ABN Bulk Extract (Australian Business Register). "
                "Confidence is a triage signal, not proof.")
+
+# ---------------------------------------------------------------- Lead dossiers
+with tab_dossier:
+    st.header("Lead dossiers — the evidence pack per case")
+    st.caption(
+        "Everything known about one sanctioned entity in a single cited document: "
+        "register history, conduct typology, every linked ABN (with ASIC number, "
+        "trading names, GST timing), the confidence rationale, matched media, and "
+        "verification steps. Built to hand to a journalist or the Commission.")
+    from app.dossier import build as build_dossier
+    leads = pd.read_sql_query("""
+        SELECT DISTINCT a.name, m.confidence FROM matches m JOIN actions a USING(action_id)
+        WHERE m.post_ban_registration=1 AND m.tier='high'
+        ORDER BY m.confidence DESC""", conn)
+    if not leads.empty:
+        pick = st.selectbox(
+            "High-confidence lead",
+            leads["name"].tolist(),
+            format_func=lambda n: f"{n}  (conf "
+            f"{leads.loc[leads['name'] == n, 'confidence'].iloc[0]:.0f})")
+        md = build_dossier(conn, pick)
+        st.download_button("Download dossier (Markdown)", md,
+                           file_name=f"dossier_{pick[:40]}.md")
+        st.markdown(md)
+    else:
+        st.info("No high-confidence leads. Run the matcher and scorer first.")
 
 # ---------------------------------------------------------------- Typologies
 with tab_typology:

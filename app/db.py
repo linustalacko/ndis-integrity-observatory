@@ -47,9 +47,27 @@ CREATE TABLE IF NOT EXISTS abns (
     status_date TEXT,                    -- ABN status from date
     gst_status TEXT,
     state TEXT, postcode TEXT,
-    norm_name TEXT
+    norm_name TEXT,
+    asic_number TEXT,                    -- ASIC company number where present
+    other_names TEXT,                    -- trading/business/other names, ' | ' joined
+    gst_from TEXT                        -- GST registration from date
 );
 CREATE INDEX IF NOT EXISTS idx_abns_norm ON abns(norm_name);
+
+-- Media releases / news items scraped from regulator sites, matched to actions.
+CREATE TABLE IF NOT EXISTS articles (
+    url TEXT PRIMARY KEY,
+    source TEXT,                         -- 'ndis-commission' | 'ndia' | ...
+    title TEXT,
+    published TEXT,
+    body TEXT
+);
+CREATE TABLE IF NOT EXISTS article_matches (
+    url TEXT,
+    action_id TEXT,
+    matched_on TEXT,                     -- the name string that hit
+    PRIMARY KEY (url, action_id)
+);
 
 -- Phoenix / linkage candidates between an enforcement entity and an ABN.
 CREATE TABLE IF NOT EXISTS matches (

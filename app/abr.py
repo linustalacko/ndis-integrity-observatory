@@ -84,16 +84,27 @@ def load(conn, zip_paths: list[Path]) -> int:
                             state = st.text or "" if st is not None else ""
                             pc = p.text or "" if p is not None else ""
                         nn = norm_name(name) if name else ""
-                        hit = abn in abns or bool(nn and (name_keys(nn) & keys))
+                        # also hit on trading/other names so renamed entities surface
+                        others = [o.text or "" for o in elem.findall(
+                            "OtherEntity/NonIndividualName/NonIndividualNameText")]
+                        other_norms = {norm_name(o) for o in others if o}
+                        hit = (abn in abns or bool(nn and (name_keys(nn) & keys))
+                               or bool(other_norms and any(
+                                   name_keys(o) & keys for o in other_norms)))
                         if hit:
                             gst = elem.find("GST")
+                            asic_el = elem.find("ASICNumber")
                             conn.execute(
                                 "INSERT OR REPLACE INTO abns (abn, legal_name, entity_type, "
-                                "abn_status, status_date, gst_status, state, postcode, norm_name) "
-                                "VALUES (?,?,?,?,?,?,?,?,?)",
+                                "abn_status, status_date, gst_status, state, postcode, "
+                                "norm_name, asic_number, other_names, gst_from) "
+                                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                                 (abn, name, ent_type, status, status_date,
                                  gst.get("status", "") if gst is not None else "",
-                                 state, pc, nn))
+                                 state, pc, nn,
+                                 (asic_el.text or "") if asic_el is not None else "",
+                                 " | ".join(o for o in others if o)[:500],
+                                 gst.get("GSTStatusFromDate", "") if gst is not None else ""))
                             inserted += 1
                         elem.clear()
                 conn.commit()
