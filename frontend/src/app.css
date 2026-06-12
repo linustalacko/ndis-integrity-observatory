@@ -1,0 +1,151 @@
+/* NDIS Integrity Observatory — Dieter Rams monochrome.
+   "Good design is as little design as possible." Grayscale, hairlines,
+   generous whitespace, tabular figures, one functional signal colour. */
+
+:root {
+	--bg: #ffffff;
+	--paper: #fbfbfa;
+	--ink: #0a0a0a;
+	--ink-2: #404040;
+	--ink-3: #8a8a87;
+	--line: #e7e7e4;
+	--line-2: #d6d6d2;
+	--hover: #f4f4f2;
+
+	/* functional signals only — used where they carry meaning, never decoration */
+	--critical: #b3261e;
+	--elevated: #8a6d1a;
+	--clear: #2e6b3e;
+
+	--mono: 'SF Mono', ui-monospace, 'JetBrains Mono', Menlo, monospace;
+	--sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+		system-ui, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+	--maxw: 1180px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+	margin: 0;
+	padding: 0;
+	background: var(--bg);
+	color: var(--ink);
+	font-family: var(--sans);
+	font-size: 15px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+	font-feature-settings: 'tnum' 1, 'cv01' 1;
+}
+
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+h1, h2, h3 { font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+h1 { font-size: 30px; line-height: 1.1; }
+h2 { font-size: 19px; }
+h3 { font-size: 15px; }
+
+/* small uppercase label */
+.label {
+	font-size: 11px;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	font-weight: 500;
+}
+
+.num { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; }
+.mono { font-family: var(--mono); font-size: 12.5px; }
+
+.muted { color: var(--ink-3); }
+.soft { color: var(--ink-2); }
+
+/* metric block */
+.metric { display: flex; flex-direction: column; gap: 6px; }
+.metric .v { font-size: 34px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; }
+.metric .k { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+
+/* hairline card */
+.card {
+	border: 1px solid var(--line);
+	background: var(--bg);
+	padding: 22px 24px;
+}
+
+/* buttons / inputs */
+input[type='text'], input[type='search'], select {
+	font-family: var(--sans);
+	font-size: 15px;
+	color: var(--ink);
+	background: var(--bg);
+	border: 1px solid var(--line-2);
+	padding: 11px 13px;
+	width: 100%;
+	border-radius: 0;
+	outline: none;
+}
+input:focus, select:focus { border-color: var(--ink); }
+
+button {
+	font-family: var(--sans);
+	font-size: 13px;
+	letter-spacing: 0.01em;
+	color: var(--ink);
+	background: var(--bg);
+	border: 1px solid var(--line-2);
+	padding: 9px 16px;
+	cursor: pointer;
+	border-radius: 0;
+	transition: background 0.12s, border-color 0.12s;
+}
+button:hover { background: var(--hover); border-color: var(--ink); }
+button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+button.primary:hover { background: var(--ink-2); }
+button.ghost { border-color: transparent; padding: 7px 12px; }
+button.ghost:hover { background: var(--hover); border-color: var(--line); }
+button.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+/* tables */
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th {
+	text-align: left;
+	font-weight: 500;
+	font-size: 11px;
+	letter-spacing: 0.07em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	padding: 9px 12px;
+	border-bottom: 1px solid var(--line-2);
+	white-space: nowrap;
+}
+td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:hover td { background: var(--paper); }
+
+/* risk dot */
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.dot.critical { background: var(--critical); }
+.dot.elevated { background: var(--elevated); }
+.dot.clear { background: var(--clear); }
+.dot.high { background: var(--ink); }
+.dot.medium { background: var(--ink-3); }
+.dot.low { background: var(--line-2); }
+
+/* confidence bar */
+.bar { height: 4px; background: var(--line); position: relative; width: 100%; }
+.bar > span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); }
+
+.tag {
+	font-size: 11px; letter-spacing: 0.04em; padding: 2px 7px;
+	border: 1px solid var(--line-2); color: var(--ink-2); white-space: nowrap;
+}
+
+hr { border: none; border-top: 1px solid var(--line); margin: 0; }
+
+::selection { background: var(--ink); color: var(--bg); }
+
+/* scrollbars — quiet */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--line-2); }
+::-webkit-scrollbar-track { background: transparent; }
