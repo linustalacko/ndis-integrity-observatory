@@ -83,7 +83,10 @@ def run(conn) -> dict:
 def main() -> int:
     conn = connect()
     stats = run(conn)
+    from .score import run as score_run
+    tiers = score_run(conn)
     print("match stats:", stats)
+    print("confidence tiers (post-sanction):", tiers)
     rows = conn.execute("""
         SELECT a.name, a.type, a.date_from, m.abn, m.note, m.match_type, m.score
         FROM matches m JOIN actions a USING(action_id)
