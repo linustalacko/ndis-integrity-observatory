@@ -1,6 +1,0 @@
-data/cache/
-__pycache__/
-.venv/
-data/seeds/*/attachment_*.pdf
-data/dcp/*.pdf
-.env
