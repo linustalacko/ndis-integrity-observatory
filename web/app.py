@@ -22,7 +22,7 @@ st.set_page_config(page_title="NDIS Provider Integrity Observatory", layout="wid
 
 @st.cache_resource
 def db():
-    return connect()
+    return connect(check_same_thread=False)
 
 
 conn = db()

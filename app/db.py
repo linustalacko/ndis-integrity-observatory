@@ -76,9 +76,11 @@ CREATE TABLE IF NOT EXISTS typologies (
 """
 
 
-def connect() -> sqlite3.Connection:
+def connect(check_same_thread: bool = True) -> sqlite3.Connection:
+    """check_same_thread=False is for the Streamlit UI, which caches one
+    connection and touches it from rerun threads (reads only)."""
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH, timeout=60)
+    conn = sqlite3.connect(DB_PATH, timeout=60, check_same_thread=check_same_thread)
     conn.row_factory = sqlite3.Row
     try:
         conn.execute("PRAGMA journal_mode=WAL")
