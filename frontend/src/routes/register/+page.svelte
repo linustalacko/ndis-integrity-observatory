@@ -22,11 +22,7 @@
 	}
 </script>
 
-<Header
-	kicker="Search with full history"
-	title="Register explorer"
-	lede="The enforcement register is a lookup box on the Commission's site. Here it is a dataset: search any provider or person and read their full action history, the register text, and which snapshot each fact came from."
-/>
+<Header title="Register" lede="Search any provider or person. Full action history, with sources." />
 
 <form
 	onsubmit={(e) => {

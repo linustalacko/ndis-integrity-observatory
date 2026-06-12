@@ -20,11 +20,7 @@
 	const riskClass = $derived(res?.risk ?? 'clear');
 </script>
 
-<Header
-	kicker="Pre-payment lookup"
-	title="Provider check"
-	lede="Name or ABN in, an integrity verdict out — what a plan manager would call before paying an invoice. The free hook into the paid claims engine."
-/>
+<Header title="Provider check" lede="Name or ABN in, an integrity verdict out." />
 
 <form
 	onsubmit={(e) => {
@@ -98,7 +94,7 @@
 		</section>
 	{/if}
 
-	<p class="disclaimer muted">{res.disclaimer}</p>
+	<p class="disclaimer muted">Public register data. A clear result is not endorsement; phoenix links are leads for verification.</p>
 {/if}
 
 <style>

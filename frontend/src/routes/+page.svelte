@@ -12,34 +12,22 @@
 			.catch((e) => (error = String(e)));
 	});
 
-	const TYPE_ORDER = [
-		'ER - Banning Order',
-		'ER - Revocation of registration',
-		'ER - Suspension of registration',
-		'ER - Refusal to re-register',
-		'ER - Compliance notice',
-		'ER - Enforceable Undertaking'
-	];
 	const monthlyRows = $derived.by(() => {
 		if (!data) return [];
 		const byMonth = new Map<string, Record<string, number>>();
 		for (const r of data.monthly) {
-			const row = byMonth.get(r.month) ?? { month: r.month as unknown as number };
-			row[r.type] = (Number(row[r.type]) || 0) + r.n;
+			const row = byMonth.get(r.month) ?? { month: r.month as unknown as number, n: 0 };
+			row.n = (Number(row.n) || 0) + r.n;
 			byMonth.set(r.month, row);
 		}
 		return [...byMonth.values()];
 	});
-	const series = TYPE_ORDER.map((key, i) => ({ key, shade: i / (TYPE_ORDER.length - 1) }));
+	const series = [{ key: 'n', shade: 0 }];
 	const maxState = $derived(Math.max(1, ...(data?.by_state.map((s) => s.n) ?? [1])));
 	const maxSpot = $derived(Math.max(1, ...(data?.hotspots.map((s) => s.n) ?? [1])));
 </script>
 
-<Header
-	kicker="National enforcement landscape"
-	title="The NDIS provider integrity record, assembled."
-	lede="Every enforcement action the NDIS Commission has published, tracked across snapshots and joined to the business register — the analytic view the regulator's own site does not provide."
-/>
+<Header title="Overview" />
 
 {#if error}
 	<div class="card">
@@ -50,55 +38,25 @@
 {:else}
 	<section class="metrics">
 		<div class="metric">
-			<span class="v num">{data.totals.actions.toLocaleString()}</span><span class="k"
-				>Enforcement actions</span
-			>
+			<span class="v num">{data.totals.actions.toLocaleString()}</span><span class="k">Actions</span>
 		</div>
 		<div class="metric">
-			<span class="v num">{data.totals.banning_orders.toLocaleString()}</span><span class="k"
-				>Banning orders</span
-			>
+			<span class="v num">{data.totals.banning_orders.toLocaleString()}</span><span class="k">Bans</span>
 		</div>
 		<div class="metric">
-			<span class="v num">{data.totals.compliance_notices.toLocaleString()}</span><span class="k"
-				>Compliance notices</span
-			>
+			<span class="v num">{data.totals.compliance_notices.toLocaleString()}</span><span class="k">Notices</span>
 		</div>
 		<div class="metric">
-			<span class="v num">{data.totals.revocations.toLocaleString()}</span><span class="k"
-				>Revocations</span
-			>
+			<span class="v num">{data.totals.revocations.toLocaleString()}</span><span class="k">Revocations</span>
 		</div>
 		<div class="metric">
-			<span class="v num">{data.totals.phoenix_high}</span><span class="k"
-				>High-conf. phoenix leads</span
-			>
+			<span class="v num">{data.totals.phoenix_high}</span><span class="k">Phoenix leads</span>
 		</div>
 	</section>
 
-	<p class="snapnote muted">
-		{data.snapshots.count} register snapshots tracked, {data.snapshots.from} → {data.snapshots.to}.
-	</p>
-
 	<section class="block">
-		<div class="block-head">
-			<h2>Enforcement actions by month</h2>
-			<div class="legend">
-				{#each series as s}
-					<span class="leg"
-						><i style="background:hsl(0 0% {Math.round(8 + s.shade * 70)}%)"></i>{s.key.replace(
-							'ER - ',
-							''
-						)}</span
-					>
-				{/each}
-			</div>
-		</div>
+		<h2 class="block-h">Actions by month</h2>
 		<BarChart data={monthlyRows} {series} labels={(d) => String(d.month)} height={280} />
-		<p class="axisnote muted">
-			Monthly, by date effective. The mid-2025 and early-2026 spikes are the Fraud Fusion Taskforce
-			enforcement waves.
-		</p>
 	</section>
 
 	<div class="two">
@@ -138,41 +96,11 @@
 		border-top: 1px solid var(--line);
 		border-bottom: 1px solid var(--line);
 	}
-	.snapnote {
-		margin: 16px 0 0;
-		font-size: 12.5px;
-	}
 	.block {
-		margin-top: 52px;
+		margin-top: 48px;
 	}
-	.block-head {
-		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
+	.block-h {
 		margin-bottom: 22px;
-		gap: 24px;
-		flex-wrap: wrap;
-	}
-	.legend {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 14px;
-	}
-	.leg {
-		font-size: 11px;
-		color: var(--ink-3);
-		display: flex;
-		align-items: center;
-		gap: 6px;
-	}
-	.leg i {
-		width: 9px;
-		height: 9px;
-		display: inline-block;
-	}
-	.axisnote {
-		margin-top: 14px;
-		font-size: 12px;
 	}
 	.two {
 		display: grid;

@@ -46,9 +46,11 @@ def overview():
     by_state = rows(c.execute(
         "SELECT state, COUNT(*) n FROM actions WHERE state != '' "
         "GROUP BY state ORDER BY n DESC"))
-    hotspots = rows(c.execute(
-        "SELECT postcode || ' ' || MAX(city) location, COUNT(*) n FROM actions "
-        "WHERE postcode != '' GROUP BY postcode ORDER BY n DESC LIMIT 12"))
+    hotspots = [
+        {"location": f"{r['postcode']} {(r['city'] or '').title()}".strip(), "n": r["n"]}
+        for r in c.execute(
+            "SELECT postcode, MAX(city) city, COUNT(*) n FROM actions "
+            "WHERE postcode != '' GROUP BY postcode ORDER BY n DESC LIMIT 12")]
     return {
         "totals": {
             "actions": sum(types.values()),

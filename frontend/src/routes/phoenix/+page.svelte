@@ -15,9 +15,8 @@
 </script>
 
 <Header
-	kicker="Sanctioned, yet an ABN is active"
 	title="Phoenix watch"
-	lede="Sanctioned entities whose name or ABN matches an active ABN registered after the sanction. Confidence is driven by name rarity, geography and match type — a common name with hundreds of namesakes scores low. Every row is a lead to verify, never an allegation."
+	lede="Sanctioned entities with an active ABN registered after the sanction. A lead to verify, not an allegation."
 />
 
 {#if data}
@@ -36,10 +35,7 @@
 
 	<table>
 		<thead>
-			<tr>
-				<th>Conf.</th><th>Name</th><th>Sanction</th><th>Effective</th>
-				<th>ABN</th><th>Namesakes</th><th>Geo</th><th>ABR record</th>
-			</tr>
+			<tr><th>Conf.</th><th>Name</th><th>Sanction</th><th>Active ABN</th></tr>
 		</thead>
 		<tbody>
 			{#each data.leads as l}
@@ -51,20 +47,18 @@
 						</div>
 					</td>
 					<td><strong>{l.name}</strong></td>
-					<td><span class="tag">{l.type.replace('ER - ', '')}</span></td>
-					<td class="num muted">{l.sanction_date}</td>
-					<td class="mono">{l.abn}</td>
-					<td class="num" class:warn={l.namesakes === 1}>{l.namesakes}</td>
-					<td>{l.geo}</td>
-					<td class="muted note">{l.note}</td>
+					<td>
+						<span class="tag">{l.type.replace('ER - ', '')}</span>
+						<span class="muted num">{l.sanction_date}</span>
+					</td>
+					<td>
+						<span class="mono">{l.abn}</span>
+						<span class="muted note">{l.note}</span>
+					</td>
 				</tr>
 			{/each}
 		</tbody>
 	</table>
-	<p class="src muted">
-		Sources: NDIS Commission compliance register (data.gov.au) + ABN Bulk Extract (Australian
-		Business Register). Confidence is a triage signal, not proof.
-	</p>
 {:else}
 	<p class="muted">Loading…</p>
 {/if}
@@ -101,15 +95,12 @@
 		width: 56px;
 	}
 	.note {
-		max-width: 280px;
-		font-size: 12px;
+		display: block;
+		font-size: 11.5px;
+		margin-top: 3px;
 	}
-	.warn {
-		font-weight: 600;
-	}
-	.src {
-		margin-top: 20px;
+	td .num {
+		margin-left: 8px;
 		font-size: 12px;
-		max-width: 680px;
 	}
 </style>

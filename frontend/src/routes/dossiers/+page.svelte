@@ -55,11 +55,7 @@
 	}
 </script>
 
-<Header
-	kicker="The evidence pack per case"
-	title="Lead dossiers"
-	lede="Everything known about one sanctioned entity in a single cited document: register history, conduct typology, every linked ABN with ASIC number and trading names, the confidence rationale, matched media, and verification steps. Built to hand to a journalist or the Commission."
-/>
+<Header title="Lead dossiers" lede="Everything known about one sanctioned entity, in one cited document." />
 
 <div class="grid">
 	<aside class="leads">

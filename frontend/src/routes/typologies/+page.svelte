@@ -19,16 +19,13 @@
 	const max = $derived(Math.max(1, ...(data?.distribution.map((d) => d.n) ?? [1])));
 </script>
 
-<Header
-	kicker="What is the conduct?"
-	title="Typologies"
-	lede="Each enforcement action's free text is classified into a conduct typology. A classification only counts if its supporting quote appears verbatim in the register text — unverified rows are excluded."
-/>
+<Header title="Typologies" lede="Conduct behind each action, classified — counted only when quote-verified." />
 
 {#if data}
 	<p class="stat muted">
-		{data.verified.toLocaleString()} of {data.classified.toLocaleString()} classifications are quote-verified
-		({Math.round((data.verified / data.classified) * 100)}%).
+		{data.verified.toLocaleString()} verified of {data.classified.toLocaleString()} ({Math.round(
+			(data.verified / data.classified) * 100
+		)}%)
 	</p>
 	<div class="grid">
 		<div class="dist">

@@ -28,14 +28,7 @@
 			{/each}
 		</nav>
 		<div class="foot">
-			<p class="muted">
-				Built from public data: the NDIS Commission compliance register
-				(data.gov.au), the ABN Bulk Extract (ABR) and the NDIS Support Catalogue.
-			</p>
-			<p class="muted">
-				Every claim links to its source. Inferences are leads for verification,
-				not allegations.
-			</p>
+			<p class="muted">Public data. Leads for verification, not allegations.</p>
 		</div>
 	</aside>
 	<main>

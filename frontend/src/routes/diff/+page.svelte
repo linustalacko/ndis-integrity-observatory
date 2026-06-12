@@ -21,11 +21,7 @@
 	});
 </script>
 
-<Header
-	kicker="What changed between snapshots"
-	title="Register diff"
-	lede="The Commission's site shows only today's register. Because every fortnightly snapshot is tracked, we can show what was added — and what was silently removed (expiries, successful appeals, quiet deletions)."
-/>
+<Header title="Register diff" lede="What was added between snapshots — and what was quietly removed." />
 
 <div class="picker">
 	<label>From <select bind:value={a}>{#each snaps as s}<option value={s}>{s}</option>{/each}</select></label>
@@ -48,7 +44,6 @@
 		</section>
 		<section>
 			<h2>－ Removed <span class="muted num">({data.gone.length})</span></h2>
-			<p class="note muted">Present in an earlier snapshot, absent from the later one.</p>
 			<table>
 				<thead><tr><th>Type</th><th>Name</th><th>State</th><th>Last seen</th></tr></thead>
 				<tbody>

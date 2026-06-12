@@ -20,11 +20,7 @@
 	const cols = $derived(data?.invoices.length ? Object.keys(data.invoices[0]) : []);
 </script>
 
-<Header
-	kicker="Invoice screening against the rules"
-	title="Claims lab"
-	lede="Deterministic screening against the NDIS Support Catalogue 2025-26 price caps, the NDIA's own fraud typologies, and the live enforcement register. The demo batch seeds every detectable fraud type; upload a CSV to screen your own."
-/>
+<Header title="Claims lab" lede="Screen invoices against the price caps, fraud rules, and the live register." />
 
 <div class="bar-actions">
 	<button class:active={mode === 'demo'} onclick={() => { mode = 'demo'; api.claimsDemo().then((d) => (data = d)); }}>
