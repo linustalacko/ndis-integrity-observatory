@@ -60,7 +60,44 @@ def verify_quote(quote: str, detail: str) -> bool:
     return bool(q) and q in d
 
 
+def repair(conn) -> tuple[int, int]:
+    """For unverified rows, replace the model's near-quote with the best truly
+    verbatim window from the action text (rapidfuzz alignment). Only accept
+    windows with similarity >= 90; otherwise leave unverified."""
+    from rapidfuzz import fuzz
+    rows = conn.execute("""
+        SELECT t.action_id, t.quote, a.detail FROM typologies t
+        JOIN actions a USING(action_id) WHERE t.quote_verified=0""").fetchall()
+    fixed = 0
+    for r in rows:
+        q = " ".join((r["quote"] or "").split())
+        d = " ".join((r["detail"] or "").split())
+        if not q or not d:
+            continue
+        # slide a window of quote length across the detail, step 10 chars
+        L = len(q)
+        best, best_s = None, 0
+        for i in range(0, max(1, len(d) - L + 1), 10):
+            cand = d[i:i + L]
+            s = fuzz.ratio(q.lower(), cand.lower())
+            if s > best_s:
+                best, best_s = cand, s
+        if best and best_s >= 90:
+            conn.execute("UPDATE typologies SET quote=?, quote_verified=1 "
+                         "WHERE action_id=?", (best, r["action_id"]))
+            fixed += 1
+    conn.commit()
+    return fixed, len(rows)
+
+
 def main(argv: list[str]) -> int:
+    if "--repair" in argv:
+        conn = connect()
+        fixed, total = repair(conn)
+        v = conn.execute("SELECT COUNT(*) c FROM typologies WHERE quote_verified=1").fetchone()["c"]
+        n = conn.execute("SELECT COUNT(*) c FROM typologies").fetchone()["c"]
+        print(f"repaired {fixed}/{total} unverified quotes -> {v}/{n} verified ({v/n:.0%})")
+        return 0
     limit = int(argv[argv.index("--limit") + 1]) if "--limit" in argv else None
     conn = connect()
     todo = conn.execute(
