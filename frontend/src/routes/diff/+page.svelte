@@ -29,7 +29,9 @@
 	<label>To <select bind:value={b}>{#each snaps as s}<option value={s}>{s}</option>{/each}</select></label>
 </div>
 
-{#if data}
+{#if snaps.length < 2}
+	<p class="muted">Need at least two register snapshots to compare.</p>
+{:else if data}
 	<div class="cols">
 		<section>
 			<h2>＋ New on register <span class="muted num">({data.new.length})</span></h2>
@@ -59,6 +61,7 @@
 <style>
 	.picker {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: flex-end;
 		gap: 16px;
 		margin-bottom: 34px;
@@ -86,10 +89,6 @@
 	}
 	h2 {
 		margin-bottom: 14px;
-	}
-	.note {
-		font-size: 12px;
-		margin: 0 0 12px;
 	}
 	@media (max-width: 860px) {
 		.cols {

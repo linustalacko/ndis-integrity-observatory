@@ -167,6 +167,10 @@
 		margin: 0;
 	}
 	.prov { font-size: 11px; margin: 4px 0 0; }
+	@media (max-width: 560px) {
+		.vtext { font-size: 19px; }
+		.rec-head { flex-wrap: wrap; gap: 4px 10px; }
+	}
 	.disclaimer {
 		font-size: 12px;
 		line-height: 1.55;

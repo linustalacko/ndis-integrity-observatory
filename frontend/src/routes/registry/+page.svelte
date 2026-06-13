@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { api, type RegistryResp } from '$lib/api';
+	import { money } from '$lib/format';
 	import Header from '$lib/Header.svelte';
 
 	let data = $state<RegistryResp | null>(null);
@@ -7,11 +8,6 @@
 	$effect(() => {
 		api.registry().then((d) => (data = d));
 	});
-	function money(n: number) {
-		if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
-		if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}k`;
-		return `$${n.toFixed(0)}`;
-	}
 </script>
 
 <Header
@@ -149,17 +145,25 @@
 		color: var(--critical);
 		margin: 0 0 14px;
 	}
-	.r {
-		text-align: right;
-	}
 	@media (max-width: 820px) {
 		.row {
-			grid-template-columns: 1fr auto;
+			grid-template-columns: 1fr auto auto;
 		}
-		.loc,
 		.svc,
 		.rules {
 			display: none;
+		}
+		.prov {
+			flex-wrap: wrap;
+		}
+		.body {
+			padding: 4px 0 22px;
+		}
+	}
+	@media (max-width: 640px) {
+		.metrics {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 18px 24px;
 		}
 	}
 </style>

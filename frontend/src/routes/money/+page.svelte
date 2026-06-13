@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { api, type MoneyResp } from '$lib/api';
+	import { money as m } from '$lib/format';
 	import Header from '$lib/Header.svelte';
 
 	let data = $state<MoneyResp | null>(null);
@@ -7,13 +8,6 @@
 		api.money().then((d) => (data = d));
 	});
 
-	function m(n: number) {
-		if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
-		if (n >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
-		if (n >= 1e3) return `$${Math.round(n / 1e3)}k`;
-		return `$${n}`;
-	}
-	const maxCase = $derived(Math.max(1, ...(data?.cases.map((c) => c.amount) ?? [1])));
 	const byYear = $derived.by(() => {
 		if (!data) return [];
 		const y = new Map<string, number>();
@@ -24,7 +18,6 @@
 		return [...y.entries()].sort().map(([year, total]) => ({ year, total }));
 	});
 	const maxYear = $derived(Math.max(1, ...byYear.map((y) => y.total)));
-	const kindOrder = ['sentenced', 'charged', 'alleged', 'seized'];
 </script>
 
 <Header title="Fraud value" lede="The dollar scale of NDIS fraud, from public data." />
@@ -145,6 +138,9 @@
 		.bands {
 			grid-template-columns: 1fr;
 			gap: 26px;
+		}
+		.bigrange {
+			font-size: 30px;
 		}
 	}
 </style>

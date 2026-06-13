@@ -190,5 +190,8 @@
 		.leads {
 			position: static;
 		}
+		.leadlist {
+			max-height: 260px;
+		}
 	}
 </style>

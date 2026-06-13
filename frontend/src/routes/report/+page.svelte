@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { api, type ClaimsResp } from '$lib/api';
+	import { money } from '$lib/format';
 	import Header from '$lib/Header.svelte';
 
 	const BASE = import.meta.env.VITE_API ?? '';
@@ -37,11 +38,6 @@
 	async function reportFraud() {
 		if (!data) return;
 		submitted = await api.report(source, data.invoices);
-	}
-	function money(n: number) {
-		if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
-		if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}k`;
-		return `$${n.toFixed(0)}`;
 	}
 	const hasFraud = $derived(!!data && data.breaches > 0);
 </script>
@@ -143,6 +139,8 @@
 	}
 	.picks {
 		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
 		gap: 10px;
 		align-items: center;
 		margin-top: 6px;
@@ -214,7 +212,13 @@
 	h2 {
 		margin: 32px 0 16px;
 	}
-	.r {
-		text-align: right;
+	@media (max-width: 560px) {
+		.drop {
+			padding: 32px 16px;
+		}
+		.metrics {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 18px 24px;
+		}
 	}
 </style>

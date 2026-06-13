@@ -139,5 +139,11 @@
 		.samples {
 			position: static;
 		}
+		.slist {
+			max-height: none;
+		}
+		.trow {
+			grid-template-columns: 1fr 64px 40px;
+		}
 	}
 </style>

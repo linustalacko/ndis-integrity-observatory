@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { api, type SignalsResp } from '$lib/api';
+	import { money } from '$lib/format';
 	import Header from '$lib/Header.svelte';
 
 	let data = $state<SignalsResp | null>(null);
@@ -10,11 +11,6 @@
 	function pct(n: number | null) {
 		if (n === null || n === undefined) return '—';
 		return `${n > 0 ? '+' : ''}${(n * 100).toFixed(0)}%`;
-	}
-	function money(n: number | null) {
-		if (!n) return '—';
-		if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
-		return `$${Math.round(n / 1e3)}k`;
 	}
 	const regions = $derived(data?.regions.slice(0, 25) ?? []);
 </script>
@@ -112,15 +108,21 @@
 		display: flex;
 		gap: 8px;
 		margin-bottom: 22px;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+	}
+	.tabs::-webkit-scrollbar {
+		display: none;
+	}
+	.tabs button {
+		white-space: nowrap;
 	}
 	.explain {
 		font-size: 12.5px;
 		line-height: 1.55;
 		max-width: 720px;
 		margin: 0 0 24px;
-	}
-	.r {
-		text-align: right;
 	}
 	.conf {
 		display: flex;

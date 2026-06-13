@@ -80,6 +80,7 @@
 	}
 	.controls {
 		display: flex;
+		flex-wrap: wrap;
 		gap: 8px;
 		align-items: center;
 		margin: 28px 0 18px;
@@ -102,5 +103,13 @@
 	td .num {
 		margin-left: 8px;
 		font-size: 12px;
+	}
+	@media (max-width: 640px) {
+		.tiers {
+			gap: 14px;
+		}
+		.metric .k {
+			gap: 5px;
+		}
 	}
 </style>
