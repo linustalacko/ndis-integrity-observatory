@@ -281,3 +281,24 @@ def _screen(src) -> dict:
                       "provider": f.provider} for f in findings],
         "invoices": [vars(i) for i in invoices],
     }
+
+
+# --- Serve the built SvelteKit SPA (single-service deploy) ---
+_BUILD = ROOT / "frontend" / "build"
+if _BUILD.exists():
+    from fastapi.responses import FileResponse
+    from fastapi.staticfiles import StaticFiles
+
+    # hashed assets
+    if (_BUILD / "_app").exists():
+        app.mount("/_app", StaticFiles(directory=_BUILD / "_app"), name="assets")
+
+    _FALLBACK = _BUILD / "200.html"
+
+    @app.get("/{path:path}")
+    def spa(path: str):
+        # serve a real file if it exists, else the SPA fallback
+        candidate = _BUILD / path
+        if path and candidate.is_file():
+            return FileResponse(candidate)
+        return FileResponse(_FALLBACK if _FALLBACK.exists() else _BUILD / "index.html")

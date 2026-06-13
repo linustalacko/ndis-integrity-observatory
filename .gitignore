@@ -3,7 +3,14 @@ __pycache__/
 .env
 data/cache/
 data/abr/
-*.db
 data/dossiers/
 data/market/*.csv
 frontend/.svelte-kit/
+frontend/node_modules/
+frontend/build/
+
+# DBs ignored by default, except the pruned deploy DB which must ship
+*.db
+*.db-shm
+*.db-wal
+!data/ndis.db

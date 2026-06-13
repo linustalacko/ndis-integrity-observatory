@@ -1,5 +1,6 @@
 // Thin typed client for the NDIS Integrity API.
-const BASE = import.meta.env.VITE_API ?? 'http://localhost:8000';
+// Same-origin in production (empty BASE -> relative /api); localhost in dev.
+const BASE = import.meta.env.VITE_API ?? '';
 
 async function get<T>(path: string): Promise<T> {
 	const r = await fetch(`${BASE}${path}`);

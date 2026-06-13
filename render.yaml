@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ndis-integrity-observatory
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /api/overview
+    envVars:
+      # Set this in the Render dashboard (Environment) for image-upload fraud detection.
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: NDIS_LLM_MODEL
+        value: anthropic/claude-haiku-4.5

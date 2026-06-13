@@ -2,7 +2,7 @@
 	import { api, type ClaimsResp } from '$lib/api';
 	import Header from '$lib/Header.svelte';
 
-	const BASE = import.meta.env.VITE_API ?? 'http://localhost:8000';
+	const BASE = import.meta.env.VITE_API ?? '';
 	let data = $state<ClaimsResp | null>(null);
 	let status = $state<'idle' | 'screening' | 'done'>('idle');
 	let source = $state('csv');
