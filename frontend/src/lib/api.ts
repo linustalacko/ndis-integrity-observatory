@@ -26,7 +26,34 @@ export const api = {
 		fd.append('file', file);
 		const r = await fetch(`${BASE}/api/claims`, { method: 'POST', body: fd });
 		return r.json() as Promise<ClaimsResp>;
-	}
+	},
+	claimsImage: async (file: File) => {
+		const fd = new FormData();
+		fd.append('file', file);
+		const r = await fetch(`${BASE}/api/claims-image`, { method: 'POST', body: fd });
+		return r.json() as Promise<ClaimsResp>;
+	},
+	report: async (source: string, invoices: any[]) => {
+		const r = await fetch(`${BASE}/api/report`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ source, invoices })
+		});
+		return r.json() as Promise<{ submitted: number; providers?: string[]; message?: string }>;
+	},
+	registry: () => get<RegistryResp>('/api/registry')
+};
+
+export type Report = {
+	report_id: string; created_at: string; provider_name: string; provider_abn: string;
+	state: string; postcode: string; city: string; services: string;
+	billed: number; at_risk: number; n_breaches: number; rules: string[];
+	findings: { line: number; rule: string; detail: string; at_risk: number }[];
+	source: string; already_sanctioned: string;
+};
+export type RegistryResp = {
+	reports: Report[]; total_at_risk: number; count: number;
+	providers: number; sanctioned: number;
 };
 
 export type Totals = {

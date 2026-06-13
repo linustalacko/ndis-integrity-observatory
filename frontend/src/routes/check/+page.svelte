@@ -20,7 +20,10 @@
 	const riskClass = $derived(res?.risk ?? 'clear');
 </script>
 
-<Header title="Provider check" lede="Name or ABN in, an integrity verdict out." />
+<Header
+	title="Provider check"
+	lede="Name or ABN in — a verdict, the full enforcement history, and any post-sanction ABNs."
+/>
 
 <form
 	onsubmit={(e) => {
@@ -55,8 +58,10 @@
 					<div class="rec-head">
 						<strong>{s.type.replace('ER - ', '')}</strong>
 						<span class="muted num">effective {s.date_from}</span>
+						{#if s.city || s.state}<span class="muted">· {s.city} {s.state} {s.postcode}</span>{/if}
 					</div>
 					<p class="detail">{s.detail}</p>
+					{#if s.first_seen}<p class="prov muted">On register {s.first_seen} → {s.last_seen} · NDIS Commission via data.gov.au</p>{/if}
 				</div>
 			{/each}
 		</section>
@@ -65,10 +70,11 @@
 	{#if res.compliance_notices.length}
 		<section>
 			<div class="label">Compliance notices ({res.compliance_notices.length})</div>
-			{#each res.compliance_notices.slice(0, 5) as n}
+			{#each res.compliance_notices as n}
 				<div class="rec">
-					<div class="rec-head"><span class="muted num">{n.date_from}</span></div>
+					<div class="rec-head"><span class="muted num">{n.date_from}</span>{#if n.city}<span class="muted">· {n.city} {n.state}</span>{/if}</div>
 					<p class="detail">{n.detail}</p>
+					{#if n.first_seen}<p class="prov muted">On register {n.first_seen} → {n.last_seen}</p>{/if}
 				</div>
 			{/each}
 		</section>
@@ -160,6 +166,7 @@
 		color: var(--ink-2);
 		margin: 0;
 	}
+	.prov { font-size: 11px; margin: 4px 0 0; }
 	.disclaimer {
 		font-size: 12px;
 		line-height: 1.55;

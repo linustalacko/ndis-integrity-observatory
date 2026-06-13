@@ -6,3 +6,4 @@ data/abr/
 *.db
 data/dossiers/
 data/market/*.csv
+frontend/.svelte-kit/

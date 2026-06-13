@@ -25,6 +25,28 @@ def _api_key() -> str:
     return key
 
 
+def vision(system: str, prompt: str, image_data_uri: str, *,
+           model: str = "anthropic/claude-haiku-4.5", max_tokens: int = 4000) -> dict:
+    """Vision call: extract structured JSON from an image (invoice photo/screenshot)."""
+    body = {
+        "model": model, "max_tokens": max_tokens, "temperature": 0.0,
+        "response_format": {"type": "json_object"},
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": image_data_uri}},
+            ]},
+        ],
+    }
+    r = httpx.post(API_URL, json=body, timeout=300,
+                   headers={"Authorization": f"Bearer {_api_key()}"})
+    r.raise_for_status()
+    content = r.json()["choices"][0]["message"]["content"]
+    content = re.sub(r"^```(json)?\s*|\s*```$", "", content.strip())
+    return json.loads(content)
+
+
 def complete(system: str, user: str, *, json_object: bool = False,
              model: str = DEFAULT_MODEL, max_tokens: int = 8000,
              temperature: float = 0.0) -> str | dict | list:

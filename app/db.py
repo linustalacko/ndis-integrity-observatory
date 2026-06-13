@@ -112,6 +112,26 @@ CREATE TABLE IF NOT EXISTS rings (
     ring_id TEXT PRIMARY KEY, address_key TEXT, state TEXT, postcode TEXT,
     abn_count INTEGER, sanctioned_count INTEGER, abns TEXT, score REAL
 );
+
+-- Crowd-sourced fraud registry. One row per flagged provider per submission.
+-- Created ONLY when the screening engine flags a breach.
+CREATE TABLE IF NOT EXISTS reports (
+    report_id TEXT PRIMARY KEY,
+    created_at TEXT DEFAULT (datetime('now')),
+    provider_name TEXT,
+    provider_abn TEXT,
+    state TEXT, postcode TEXT, city TEXT,
+    services TEXT,                       -- support-item categories billed
+    billed REAL,                         -- $ billed for this provider in the batch
+    at_risk REAL,                        -- $ flagged
+    n_breaches INTEGER,
+    rules TEXT,                          -- JSON list of rule codes
+    findings TEXT,                       -- JSON list of finding objects
+    source TEXT,                         -- csv | image
+    already_sanctioned TEXT,             -- register match summary, or ''
+    confirmations INTEGER DEFAULT 0      -- crowd up-votes
+);
+CREATE INDEX IF NOT EXISTS idx_reports_prov ON reports(provider_name);
 """
 
 

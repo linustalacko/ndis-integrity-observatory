@@ -10,6 +10,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -185,6 +186,61 @@ def claims_demo():
     return _screen(ROOT / "data" / "synthetic_invoices.csv")
 
 
+@app.post("/api/claims-image")
+async def claims_image(file: UploadFile):
+    from app.claims import (catalogue_index, fetch_catalogue, provider_summary,
+                            sanctioned_providers, screen)
+    from app.extract_image import extract
+    content = await file.read()
+    mime = file.content_type or "image/png"
+    invoices, raw = extract(content, mime)
+    cat = catalogue_index(fetch_catalogue())
+    findings = screen(invoices, cat, sanctioned_providers(db()))
+    return {
+        "lines": len(invoices),
+        "breaches": sum(1 for f in findings if f.severity == "breach"),
+        "warnings": sum(1 for f in findings if f.severity == "warning"),
+        "at_risk": round(sum(f.at_risk for f in findings), 2),
+        "billed": round(sum(i.unit_price * i.qty for i in invoices), 2),
+        "providers": provider_summary(findings),
+        "findings": [{"line": f.invoice_line, "rule": f.rule, "severity": f.severity,
+                      "detail": f.detail, "citation": f.citation, "at_risk": f.at_risk,
+                      "provider": f.provider} for f in findings],
+        "invoices": [vars(i) for i in invoices],
+        "extracted": raw,
+    }
+
+
+class ReportBody(BaseModel):
+    source: str = "csv"
+    invoices: list[dict]
+
+
+@app.post("/api/report")
+def report(body: ReportBody):
+    """Submit a screened batch to the shared registry. Gated: only providers with
+    a breach are recorded; a clean batch yields nothing."""
+    from app.claims import (Invoice, catalogue_index, fetch_catalogue,
+                            sanctioned_providers, screen)
+    from app.registry import build_reports, submit
+    invoices = [Invoice(**{k: v for k, v in d.items() if k in Invoice.__dataclass_fields__})
+                for d in body.invoices]
+    cat = catalogue_index(fetch_catalogue())
+    sanctions = sanctioned_providers(db())
+    findings = screen(invoices, cat, sanctions)
+    reports = build_reports(invoices, findings, sanctions, body.source)
+    if not reports:
+        return {"submitted": 0, "message": "No fraud detected — nothing to report."}
+    n = submit(db(), reports)
+    return {"submitted": n, "providers": [r["provider_name"] for r in reports]}
+
+
+@app.get("/api/registry")
+def registry():
+    from app.registry import listing
+    return listing(db())
+
+
 @app.get("/api/claims-template")
 def claims_template():
     from fastapi.responses import PlainTextResponse
@@ -223,5 +279,5 @@ def _screen(src) -> dict:
         "findings": [{"line": f.invoice_line, "rule": f.rule, "severity": f.severity,
                       "detail": f.detail, "citation": f.citation, "at_risk": f.at_risk,
                       "provider": f.provider} for f in findings],
-        "invoices": df.fillna("").astype(str).to_dict(orient="records"),
+        "invoices": [vars(i) for i in invoices],
     }

@@ -3,17 +3,24 @@
 	import { page } from '$app/state';
 	let { children } = $props();
 
-	const nav = [
-		{ href: '/', label: 'Overview' },
-		{ href: '/signals', label: 'Fraud signals' },
-		{ href: '/money', label: 'Fraud value' },
-		{ href: '/phoenix', label: 'Banned & back' },
-		{ href: '/claims', label: 'Claims lab' },
-		{ href: '/dossiers', label: 'Case dossiers' },
-		{ href: '/check', label: 'Provider check' },
-		{ href: '/register', label: 'Register' },
-		{ href: '/typologies', label: 'Typologies' },
-		{ href: '/diff', label: 'Register diff' }
+	// Two groups: the product (find fraud) and the analyst tools (investigate).
+	const groups = [
+		{
+			label: 'Find fraud',
+			items: [
+				{ href: '/registry', label: 'Fraud registry' },
+				{ href: '/report', label: 'Report fraud' },
+				{ href: '/check', label: 'Provider check' }
+			]
+		},
+		{
+			label: 'Intelligence',
+			items: [
+				{ href: '/', label: 'Overview' },
+				{ href: '/signals', label: 'Fraud signals' },
+				{ href: '/phoenix', label: 'Banned & back' }
+			]
+		}
 	];
 	const current = $derived(page.url.pathname);
 </script>
@@ -25,8 +32,11 @@
 			<div class="title">Provider Integrity<br />Observatory</div>
 		</div>
 		<nav>
-			{#each nav as item}
-				<a href={item.href} class:active={current === item.href}>{item.label}</a>
+			{#each groups as group}
+				<div class="group-label">{group.label}</div>
+				{#each group.items as item}
+					<a href={item.href} class:active={current === item.href}>{item.label}</a>
+				{/each}
 			{/each}
 		</nav>
 		<div class="foot">
@@ -78,6 +88,17 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1px;
+	}
+	.group-label {
+		font-size: 10px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+		margin: 18px 0 6px;
+		font-weight: 500;
+	}
+	.group-label:first-child {
+		margin-top: 0;
 	}
 	nav a {
 		font-size: 14px;
