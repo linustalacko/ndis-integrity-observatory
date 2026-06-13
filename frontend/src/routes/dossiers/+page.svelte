@@ -51,7 +51,7 @@
 	function inline(s: string) {
 		return esc(s)
 			.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-			.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noreferrer">$1</a>');
+			.replace(/(https?:\/\/[^\s"'<>]+)/g, '<a href="$1" target="_blank" rel="noreferrer">$1</a>');
 	}
 </script>
 

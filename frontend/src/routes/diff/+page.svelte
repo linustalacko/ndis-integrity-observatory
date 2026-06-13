@@ -96,4 +96,9 @@
 			gap: 32px;
 		}
 	}
+	@media (max-width: 560px) {
+		.arrow {
+			display: none;
+		}
+	}
 </style>

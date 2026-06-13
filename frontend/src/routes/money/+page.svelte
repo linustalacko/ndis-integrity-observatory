@@ -39,7 +39,7 @@
 	<p class="gap muted">
 		The gap is the point: less than {Math.round((data.case_total / data.systemic.low) * 100)}% of one year's
 		estimated leakage has been charged. Brand-new fraud only becomes visible once live claims are
-		screened — see the Claims lab.
+		screened — <a href="/report">screen an invoice batch</a>.
 	</p>
 
 	<section class="block">

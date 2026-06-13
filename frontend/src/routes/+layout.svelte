@@ -32,7 +32,19 @@
 		}
 	];
 	const current = $derived(page.url.pathname);
+
+	const SITE = 'NDIS Provider Integrity Observatory';
+	const titles: Record<string, string> = Object.fromEntries(
+		groups.flatMap((g) => g.items.map((i) => [i.href, i.label]))
+	);
+	const pageTitle = $derived(
+		current === '/' ? SITE : titles[current] ? `${titles[current]} · ${SITE}` : SITE
+	);
 </script>
+
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
 
 <div class="shell">
 	<aside>

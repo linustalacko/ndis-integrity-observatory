@@ -8,9 +8,19 @@ import io
 import sys
 from pathlib import Path
 
-from fastapi import FastAPI, Query, UploadFile
+from fastapi import FastAPI, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+MAX_UPLOAD = 8 * 1024 * 1024  # 8 MB — invoice CSVs and photos are small
+
+
+async def read_capped(file: UploadFile, limit: int = MAX_UPLOAD) -> bytes:
+    """Read an upload, rejecting anything over `limit` without buffering it all."""
+    content = await file.read(limit + 1)
+    if len(content) > limit:
+        raise HTTPException(status_code=413, detail="File too large (8 MB max).")
+    return content
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -191,7 +201,7 @@ async def claims_image(file: UploadFile):
     from app.claims import (catalogue_index, fetch_catalogue, provider_summary,
                             sanctioned_providers, screen)
     from app.extract_image import extract
-    content = await file.read()
+    content = await read_capped(file)
     mime = file.content_type or "image/png"
     invoices, raw = extract(content, mime)
     cat = catalogue_index(fetch_catalogue())
@@ -212,8 +222,8 @@ async def claims_image(file: UploadFile):
 
 
 class ReportBody(BaseModel):
-    source: str = "csv"
-    invoices: list[dict]
+    source: str = Field("csv", max_length=20)
+    invoices: list[dict] = Field(..., max_length=10000)
 
 
 @app.post("/api/report")
@@ -255,7 +265,7 @@ def claims_template():
 
 @app.post("/api/claims")
 async def claims(file: UploadFile):
-    content = await file.read()
+    content = await read_capped(file)
     return _screen(io.BytesIO(content))
 
 
@@ -294,11 +304,15 @@ if _BUILD.exists():
         app.mount("/_app", StaticFiles(directory=_BUILD / "_app"), name="assets")
 
     _FALLBACK = _BUILD / "200.html"
+    _BUILD_RESOLVED = _BUILD.resolve()
 
     @app.get("/{path:path}")
     def spa(path: str):
-        # serve a real file if it exists, else the SPA fallback
-        candidate = _BUILD / path
-        if path and candidate.is_file():
-            return FileResponse(candidate)
+        # Serve a real file if it exists, else the SPA fallback.
+        # Resolve and contain within the build dir: a request like
+        # `..%2F..%2Fdata%2Fndis.db` must not escape to read arbitrary files.
+        if path:
+            candidate = (_BUILD / path).resolve()
+            if candidate.is_file() and candidate.is_relative_to(_BUILD_RESOLVED):
+                return FileResponse(candidate)
         return FileResponse(_FALLBACK if _FALLBACK.exists() else _BUILD / "index.html")

@@ -28,13 +28,6 @@
 		const f = e.dataTransfer?.files?.[0];
 		if (f) handle(f);
 	}
-	async function demo() {
-		submitted = null;
-		status = 'screening';
-		source = 'csv';
-		data = await api.claimsDemo();
-		status = 'done';
-	}
 	async function reportFraud() {
 		if (!data) return;
 		submitted = await api.report(source, data.invoices);
@@ -44,8 +37,12 @@
 
 <Header
 	title="Report fraud"
-	lede="Drop an invoice CSV or a photo of an invoice. If the rules flag fraud, send it to the shared registry with one tap."
+	lede="Upload an invoice CSV or a photo of an invoice. If the rules flag fraud, send it to the shared registry with one tap."
 />
+
+<p class="template muted">
+	Need the format? <a class="link" href={`${BASE}/api/claims-template`} download>Download the CSV template →</a>
+</p>
 
 <div
 	class="drop"
@@ -63,8 +60,6 @@
 	<p class="muted">or</p>
 	<div class="picks">
 		<label class="btn">Choose file<input type="file" accept=".csv,image/*" onchange={onPick} /></label>
-		<button onclick={demo}>Try the demo batch</button>
-		<a class="link" href={`${BASE}/api/claims-template`}>CSV template</a>
 	</div>
 </div>
 
@@ -132,6 +127,19 @@
 		border-color: var(--ink);
 		background: var(--paper);
 	}
+	.template {
+		font-size: 13px;
+		margin: -10px 0 22px;
+	}
+	.template .link {
+		color: var(--ink);
+		border-bottom: 1px solid var(--line-2);
+		padding-bottom: 1px;
+	}
+	.template .link:hover {
+		border-bottom-color: var(--ink);
+		text-decoration: none;
+	}
 	.big {
 		font-size: 17px;
 		font-weight: 500;
@@ -145,16 +153,14 @@
 		align-items: center;
 		margin-top: 6px;
 	}
-	.btn,
-	.link {
+	.btn {
 		font-size: 13px;
 		border: 1px solid var(--line-2);
 		padding: 9px 16px;
 		cursor: pointer;
 		color: var(--ink);
 	}
-	.btn:hover,
-	.link:hover {
+	.btn:hover {
 		background: var(--hover);
 		border-color: var(--ink);
 		text-decoration: none;
