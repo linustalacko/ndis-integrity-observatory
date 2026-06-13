@@ -73,8 +73,12 @@ export type MoneyResp = {
 	by_kind: Record<string, number>;
 	case_count: number;
 };
-export type Finding = { line: number; rule: string; severity: string; detail: string; citation: string };
+export type Finding = {
+	line: number; rule: string; severity: string; detail: string;
+	citation: string; at_risk: number; provider: string;
+};
+export type ProviderRisk = { provider: string; findings: number; at_risk: number; rules: string[] };
 export type ClaimsResp = {
-	lines: number; breaches: number; warnings: number;
-	findings: Finding[]; invoices: Record<string, string>[];
+	lines: number; breaches: number; warnings: number; at_risk: number; billed: number;
+	providers: ProviderRisk[]; findings: Finding[]; invoices: Record<string, string>[];
 };

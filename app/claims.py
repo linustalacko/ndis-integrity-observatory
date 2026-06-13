@@ -44,6 +44,8 @@ class Finding:
     invoice_line: int
     detail: str
     citation: str
+    at_risk: float = 0.0    # dollars exposed by this finding
+    provider: str = ""
 
 
 @dataclass
@@ -116,73 +118,86 @@ def screen(invoices: list[Invoice], catalogue: dict, sanctions: dict) -> list[Fi
     seen = {}
     worker_day_hours = defaultdict(float)
 
+    import datetime
     for inv in invoices:
+        line_value = inv.unit_price * inv.qty
+
+        def add(rule, severity, detail, citation, at_risk):
+            findings.append(Finding(rule, severity, inv.line, detail, citation,
+                                    round(at_risk, 2), inv.provider_name))
+
         item = catalogue.get(inv.item_code)
         if item is None:
-            findings.append(Finding("R2 invalid support item", "breach", inv.line,
-                                    f"item {inv.item_code} not in Support Catalogue 2025-26",
-                                    "NDIS Support Catalogue 2025-26 v1.1"))
+            add("R2 invalid support item", "breach",
+                f"item {inv.item_code} not in Support Catalogue 2025-26",
+                "NDIS Support Catalogue 2025-26 v1.1", line_value)
         else:
             cap = item["caps"].get(inv.state.upper())
             if cap and inv.unit_price > cap + 0.005:
-                findings.append(Finding(
-                    "R1 price-cap breach", "breach", inv.line,
+                add("R1 price-cap breach", "breach",
                     f"{inv.item_code} charged ${inv.unit_price:.2f} vs cap ${cap:.2f} "
                     f"({inv.state}) — {(inv.unit_price / cap - 1) * 100:.0f}% over",
-                    f"Support Catalogue: {item['name'][:60]}"))
+                    f"Support Catalogue: {item['name'][:60]}",
+                    (inv.unit_price - cap) * inv.qty)
 
         key = (inv.participant, inv.provider_abn or inv.provider_name,
                inv.item_code, inv.service_date, inv.qty)
         if key in seen:
-            findings.append(Finding("R3 duplicate claim", "breach", inv.line,
-                                    f"identical to line {seen[key]} "
-                                    f"(participant/provider/item/date/qty)",
-                                    "duplicate-detection rule"))
+            add("R3 duplicate claim", "breach",
+                f"identical to line {seen[key]} (participant/provider/item/date/qty)",
+                "duplicate-detection rule", line_value)
         seen.setdefault(key, inv.line)
 
         if inv.worker_id and inv.hours:
             wd = (inv.worker_id, inv.service_date)
             worker_day_hours[wd] += inv.hours
             if worker_day_hours[wd] > 24:
-                findings.append(Finding(
-                    "R4 impossible day", "breach", inv.line,
+                add("R4 impossible day", "breach",
                     f"worker {inv.worker_id} billed {worker_day_hours[wd]:.1f}h "
-                    f"on {inv.service_date}", "24h/day physical limit"))
+                    f"on {inv.service_date}", "24h/day physical limit", line_value)
 
         if inv.plan_start and inv.plan_end and not (
                 inv.plan_start <= inv.service_date <= inv.plan_end):
-            findings.append(Finding(
-                "R5 expired-plan claim", "breach", inv.line,
+            add("R5 expired-plan claim", "breach",
                 f"service {inv.service_date} outside plan {inv.plan_start}..{inv.plan_end}",
-                "NDIA typology: claiming from expired plans"))
+                "NDIA typology: claiming from expired plans", line_value)
 
         if inv.service_date and inv.claim_date and inv.service_date > inv.claim_date:
-            findings.append(Finding(
-                "R8 advance claiming", "breach", inv.line,
+            add("R8 advance claiming", "breach",
                 f"service {inv.service_date} is after claim date {inv.claim_date}",
-                "NDIA typology: claiming in advance of delivery"))
+                "NDIA typology: claiming in advance of delivery", line_value)
 
-        import datetime
+        name = (item or {}).get("name", "").lower()
         try:
-            wd = datetime.date.fromisoformat(inv.service_date).weekday()
-            code_l = inv.item_code.lower()
-            if wd < 5 and ("saturday" in (catalogue.get(inv.item_code) or {}).get(
-                    "name", "").lower() or "sunday" in (catalogue.get(inv.item_code) or {}).get("name", "").lower()):
-                findings.append(Finding(
-                    "R6 weekend item on weekday", "warning", inv.line,
-                    f"weekend-loaded item {inv.item_code} delivered on a weekday "
-                    f"({inv.service_date})", "Support Catalogue item name"))
+            if (datetime.date.fromisoformat(inv.service_date).weekday() < 5
+                    and ("saturday" in name or "sunday" in name)):
+                add("R6 weekend item on weekday", "warning",
+                    f"weekend-loaded item {inv.item_code} on a weekday ({inv.service_date})",
+                    "Support Catalogue item name", 0.0)
         except ValueError:
             pass
 
         hit = sanctions.get(inv.provider_abn) or sanctions.get(norm_name(inv.provider_name))
         if hit:
-            findings.append(Finding(
-                "R7 sanctioned provider", "breach", inv.line,
+            add("R7 sanctioned provider", "breach",
                 f"provider '{inv.provider_name}' matches enforcement register: {hit}",
-                "NDIS Commission compliance register (data.gov.au)"))
+                "NDIS Commission compliance register (data.gov.au)", line_value)
 
     return findings
+
+
+def provider_summary(findings: list[Finding]) -> list[dict]:
+    """Roll findings up to provider level, ranked by dollars at risk."""
+    agg: dict[str, dict] = {}
+    for f in findings:
+        a = agg.setdefault(f.provider, {"provider": f.provider, "findings": 0,
+                                        "at_risk": 0.0, "rules": set()})
+        a["findings"] += 1
+        a["at_risk"] += f.at_risk
+        a["rules"].add(f.rule.split(" ", 1)[0])
+    rows = [{**a, "rules": sorted(a["rules"]), "at_risk": round(a["at_risk"], 2)}
+            for a in agg.values()]
+    return sorted(rows, key=lambda r: -r["at_risk"])
 
 
 def load_invoices(path: str | Path) -> list[Invoice]:

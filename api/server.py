@@ -166,6 +166,18 @@ def claims_demo():
     return _screen(ROOT / "data" / "synthetic_invoices.csv")
 
 
+@app.get("/api/claims-template")
+def claims_template():
+    from fastapi.responses import PlainTextResponse
+    cols = ("participant,provider_name,provider_abn,item_code,service_date,"
+            "claim_date,qty,unit_price,state,plan_start,plan_end,worker_id,hours")
+    example = ("P0001,Example Care Co,51111000001,01_011_0107_1_1,2026-05-04,"
+               "2026-05-06,2,72.10,NSW,2026-01-01,2026-12-31,W1,2")
+    return PlainTextResponse(cols + "\n" + example + "\n",
+                             headers={"Content-Disposition": "attachment; "
+                                      "filename=invoice_template.csv"})
+
+
 @app.post("/api/claims")
 async def claims(file: UploadFile):
     content = await file.read()
@@ -174,17 +186,23 @@ async def claims(file: UploadFile):
 
 def _screen(src) -> dict:
     from app.claims import (catalogue_index, fetch_catalogue, load_invoices,
-                            sanctioned_providers, screen)
+                            provider_summary, sanctioned_providers, screen)
     import pandas as pd
     invoices = load_invoices(src)
     cat = catalogue_index(fetch_catalogue())
     findings = screen(invoices, cat, sanctioned_providers(db()))
     df = pd.read_csv(src if not hasattr(src, "seek") else (src.seek(0) or src))
+    billed = float((df.get("unit_price", 0).astype(float) * df.get("qty", 1).astype(float)).sum()) \
+        if "unit_price" in df.columns else 0.0
     return {
         "lines": len(invoices),
         "breaches": sum(1 for f in findings if f.severity == "breach"),
         "warnings": sum(1 for f in findings if f.severity == "warning"),
+        "at_risk": round(sum(f.at_risk for f in findings), 2),
+        "billed": round(billed, 2),
+        "providers": provider_summary(findings),
         "findings": [{"line": f.invoice_line, "rule": f.rule, "severity": f.severity,
-                      "detail": f.detail, "citation": f.citation} for f in findings],
+                      "detail": f.detail, "citation": f.citation, "at_risk": f.at_risk,
+                      "provider": f.provider} for f in findings],
         "invoices": df.fillna("").astype(str).to_dict(orient="records"),
     }

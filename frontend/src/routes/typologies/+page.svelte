@@ -87,6 +87,13 @@
 	.trow:hover {
 		background: var(--paper);
 	}
+	.trow.active {
+		background: var(--paper);
+		color: var(--ink);
+		border-left: 2px solid var(--ink);
+		padding-left: 10px;
+		margin-left: -12px;
+	}
 	.trow.active .tname {
 		font-weight: 600;
 	}
