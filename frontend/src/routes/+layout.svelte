@@ -33,6 +33,13 @@
 	];
 	const current = $derived(page.url.pathname);
 
+	// Mobile hamburger menu. Closes itself whenever the route changes.
+	let menuOpen = $state(false);
+	$effect(() => {
+		current;
+		menuOpen = false;
+	});
+
 	const SITE = 'NDIS Provider Integrity Observatory';
 	const titles: Record<string, string> = Object.fromEntries(
 		groups.flatMap((g) => g.items.map((i) => [i.href, i.label]))
@@ -47,20 +54,33 @@
 </svelte:head>
 
 <div class="shell">
-	<aside>
-		<div class="brand">
-			<div class="mark">NDIS</div>
-			<div class="title"><span>Provider Integrity</span> <span>Observatory</span></div>
+	<aside class:open={menuOpen}>
+		<div class="topbar">
+			<a href="/" class="brand">
+				<div class="mark">NDIS</div>
+				<div class="title"><span>Provider Integrity</span> <span>Observatory</span></div>
+				<div class="title-m">Integrity</div>
+			</a>
+			<button
+				class="burger"
+				class:open={menuOpen}
+				aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+				aria-expanded={menuOpen}
+				onclick={() => (menuOpen = !menuOpen)}
+			>
+				<span></span><span></span><span></span>
+			</button>
 		</div>
-		<nav>
-			{#each groups as group}
-				<div class="group-label">{group.label}</div>
-				{#each group.items as item}
-					<a href={item.href} class:active={current === item.href}>{item.label}</a>
+		<div class="panel">
+			<nav>
+				{#each groups as group}
+					<div class="group-label">{group.label}</div>
+					{#each group.items as item}
+						<a href={item.href} class:active={current === item.href}>{item.label}</a>
+					{/each}
 				{/each}
-			{/each}
-		</nav>
-		<div class="foot">
+			</nav>
+			<div class="foot">
 			<p class="muted">Public data. Leads for verification, not allegations.</p>
 			<a
 				class="gh"
@@ -75,6 +95,7 @@
 				</svg>
 				Open source on GitHub
 			</a>
+			</div>
 		</div>
 	</aside>
 	<main>
@@ -103,6 +124,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
+		color: inherit;
+	}
+	.brand:hover {
+		text-decoration: none;
 	}
 	.mark {
 		font-size: 12px;
@@ -120,6 +145,15 @@
 	}
 	.title span {
 		display: block;
+	}
+	/* compact brand label + hamburger: mobile only */
+	.title-m,
+	.burger {
+		display: none;
+	}
+	/* on desktop the panel is transparent — nav and foot lay out directly in the aside */
+	.panel {
+		display: contents;
 	}
 	nav {
 		display: flex;
@@ -180,65 +214,103 @@
 		max-width: var(--maxw);
 		width: 100%;
 	}
-	/* mobile: sidebar becomes a sticky top bar with a scrollable nav strip */
+	/* mobile: sidebar collapses to a sticky top bar with a hamburger dropdown */
 	@media (max-width: 760px) {
 		.shell {
 			display: block;
 		}
 		aside {
+			display: block;
 			position: sticky;
 			top: 0;
-			z-index: 10;
+			z-index: 20;
 			height: auto;
 			overflow: visible;
 			background: var(--bg);
 			border-right: none;
 			border-bottom: 1px solid var(--line);
-			padding: 12px 18px 0;
-			gap: 10px;
+			padding: 0;
+			gap: 0;
+		}
+		.topbar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 13px 18px;
 		}
 		.brand {
 			flex-direction: row;
 			align-items: center;
-			gap: 10px;
+			gap: 9px;
 		}
 		.mark {
 			font-size: 11px;
 			padding: 3px 6px;
 		}
 		.title {
-			font-size: 14px;
+			display: none;
+		}
+		.title-m {
+			display: block;
+			font-size: 15px;
+			font-weight: 600;
+			letter-spacing: -0.02em;
+			color: var(--ink);
+		}
+		.burger {
 			display: flex;
+			flex-direction: column;
+			justify-content: center;
 			gap: 4px;
+			width: 40px;
+			height: 40px;
+			padding: 0;
+			border: 1px solid var(--line-2);
+			background: var(--bg);
+		}
+		.burger span {
+			display: block;
+			width: 18px;
+			height: 1.5px;
+			margin: 0 auto;
+			background: var(--ink);
+			transition: transform 0.18s, opacity 0.18s;
+		}
+		.burger.open span:nth-child(1) {
+			transform: translateY(5.5px) rotate(45deg);
+		}
+		.burger.open span:nth-child(2) {
+			opacity: 0;
+		}
+		.burger.open span:nth-child(3) {
+			transform: translateY(-5.5px) rotate(-45deg);
+		}
+		.panel {
+			display: none;
+		}
+		aside.open .panel {
+			display: block;
+			border-top: 1px solid var(--line);
+			max-height: calc(100vh - 67px);
+			overflow-y: auto;
 		}
 		nav {
-			flex-direction: row;
-			align-items: center;
-			gap: 2px;
-			overflow-x: auto;
-			-webkit-overflow-scrolling: touch;
-			scrollbar-width: none;
-			margin: 0 -18px;
-			padding: 0 14px;
-		}
-		nav::-webkit-scrollbar {
-			display: none;
+			gap: 1px;
+			padding: 10px 18px 14px;
 		}
 		.group-label {
-			display: none;
+			margin: 16px 0 4px;
 		}
 		nav a {
-			white-space: nowrap;
+			font-size: 15px;
+			padding: 11px 10px;
 			margin: 0;
-			padding: 10px 9px 12px;
-			border-left: none;
-			border-bottom: 2px solid transparent;
-		}
-		nav a.active {
-			border-bottom-color: var(--ink);
 		}
 		.foot {
-			display: none;
+			display: flex;
+			margin-top: 0;
+			padding: 14px 18px 20px;
+			border-top: 1px solid var(--line);
 		}
 		main {
 			padding: 26px 18px 48px;
