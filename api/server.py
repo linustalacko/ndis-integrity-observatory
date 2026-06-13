@@ -155,6 +155,12 @@ def diff(a: str, b: str):
     return {"new": new, "gone": gone}
 
 
+@app.get("/api/money")
+def money():
+    from app.money import summary
+    return summary()
+
+
 @app.get("/api/claims-demo")
 def claims_demo():
     return _screen(ROOT / "data" / "synthetic_invoices.csv")

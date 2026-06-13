@@ -27,7 +27,10 @@
 	const maxSpot = $derived(Math.max(1, ...(data?.hotspots.map((s) => s.n) ?? [1])));
 </script>
 
-<Header title="Overview" />
+<Header
+	title="Overview"
+	lede="Two jobs: surface banned operators who are quietly back in business, and screen live invoices for fraud as it happens."
+/>
 
 {#if error}
 	<div class="card">

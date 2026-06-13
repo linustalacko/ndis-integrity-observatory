@@ -18,6 +18,7 @@ export const api = {
 	typologySamples: (t: string) => get<{ samples: Sample[] }>(`/api/typology-samples?typology=${encodeURIComponent(t)}`),
 	snapshots: () => get<{ snapshots: string[] }>('/api/snapshots'),
 	diff: (a: string, b: string) => get<DiffResp>(`/api/diff?a=${a}&b=${b}`),
+	money: () => get<MoneyResp>('/api/money'),
 	claimsDemo: () => get<ClaimsResp>('/api/claims-demo'),
 	claimsUpload: async (file: File) => {
 		const fd = new FormData();
@@ -63,6 +64,14 @@ export type Sample = { name: string; type: string; date_from: string; quote: str
 export type DiffResp = {
 	new: { type: string; name: string; state: string; date_from: string }[];
 	gone: { type: string; name: string; state: string; date_from: string; last_seen: string }[];
+};
+export type MoneyCase = { date: string; amount: number; title: string; kind: string; url: string };
+export type MoneyResp = {
+	systemic: { label: string; low: number; high: number; basis: string; source: string };
+	cases: MoneyCase[];
+	case_total: number;
+	by_kind: Record<string, number>;
+	case_count: number;
 };
 export type Finding = { line: number; rule: string; severity: string; detail: string; citation: string };
 export type ClaimsResp = {

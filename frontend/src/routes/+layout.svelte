@@ -5,13 +5,14 @@
 
 	const nav = [
 		{ href: '/', label: 'Overview' },
+		{ href: '/money', label: 'Fraud value' },
+		{ href: '/phoenix', label: 'Banned & back' },
+		{ href: '/claims', label: 'Claims lab' },
+		{ href: '/dossiers', label: 'Case dossiers' },
 		{ href: '/check', label: 'Provider check' },
 		{ href: '/register', label: 'Register' },
-		{ href: '/phoenix', label: 'Phoenix watch' },
-		{ href: '/dossiers', label: 'Lead dossiers' },
 		{ href: '/typologies', label: 'Typologies' },
-		{ href: '/diff', label: 'Register diff' },
-		{ href: '/claims', label: 'Claims lab' }
+		{ href: '/diff', label: 'Register diff' }
 	];
 	const current = $derived(page.url.pathname);
 </script>

@@ -15,15 +15,15 @@
 </script>
 
 <Header
-	title="Phoenix watch"
-	lede="Sanctioned entities with an active ABN registered after the sanction. A lead to verify, not an allegation."
+	title="Banned & back"
+	lede="People the regulator banned who have since registered a new active business. The highest-value leads to investigate — verify before relying."
 />
 
 {#if data}
 	<section class="tiers">
-		<div class="metric"><span class="v num">{data.counts.high ?? 0}</span><span class="k"><span class="dot high"></span> High confidence</span></div>
-		<div class="metric"><span class="v num">{data.counts.medium ?? 0}</span><span class="k"><span class="dot medium"></span> Medium</span></div>
-		<div class="metric"><span class="v num">{data.counts.low ?? 0}</span><span class="k"><span class="dot low"></span> Low (likely collisions)</span></div>
+		<div class="metric"><span class="v num">{data.counts.high ?? 0}</span><span class="k"><span class="dot high"></span> Strong leads</span></div>
+		<div class="metric"><span class="v num">{data.counts.medium ?? 0}</span><span class="k"><span class="dot medium"></span> Worth a look</span></div>
+		<div class="metric"><span class="v num">{data.counts.low ?? 0}</span><span class="k"><span class="dot low"></span> Likely name clashes</span></div>
 	</section>
 
 	<div class="controls">
