@@ -5,6 +5,7 @@
 
 	const nav = [
 		{ href: '/', label: 'Overview' },
+		{ href: '/signals', label: 'Fraud signals' },
 		{ href: '/money', label: 'Fraud value' },
 		{ href: '/phoenix', label: 'Banned & back' },
 		{ href: '/claims', label: 'Claims lab' },

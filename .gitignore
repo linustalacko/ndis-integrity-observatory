@@ -5,3 +5,4 @@ data/cache/
 data/abr/
 *.db
 data/dossiers/
+data/market/*.csv

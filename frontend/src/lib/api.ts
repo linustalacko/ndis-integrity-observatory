@@ -19,6 +19,7 @@ export const api = {
 	snapshots: () => get<{ snapshots: string[] }>('/api/snapshots'),
 	diff: (a: string, b: string) => get<DiffResp>(`/api/diff?a=${a}&b=${b}`),
 	money: () => get<MoneyResp>('/api/money'),
+	signals: () => get<SignalsResp>('/api/signals'),
 	claimsDemo: () => get<ClaimsResp>('/api/claims-demo'),
 	claimsUpload: async (file: File) => {
 		const fd = new FormData();
@@ -72,6 +73,25 @@ export type MoneyResp = {
 	case_total: number;
 	by_kind: Record<string, number>;
 	case_count: number;
+};
+export type Region = {
+	state: string; district: string; providers_first: number; providers_last: number;
+	growth: number; excess_growth: number; frag: number | null;
+	spend_per_provider: number | null; enf_density: number; risk: number;
+};
+export type Operator = {
+	name: string; type: string; date_from: string; state: string; postcode: string;
+	n_abns: number; n_post_ban: number; abns: string[]; sanctioned: boolean;
+};
+export type Family = {
+	surname: string; postcode: string; state: string; people: string[];
+	n_people: number; n_sanctioned: number;
+	members: { name: string; type: string; date_from: string }[];
+};
+export type SignalsResp = {
+	regions: Region[]; national_growth: number;
+	national_series: { c: number; quarter: string }[];
+	operators: Operator[]; families: Family[];
 };
 export type Finding = {
 	line: number; rule: string; severity: string; detail: string;

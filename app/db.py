@@ -91,6 +91,27 @@ CREATE TABLE IF NOT EXISTS typologies (
     model TEXT,
     classified_at TEXT DEFAULT (datetime('now'))
 );
+
+-- NDIA active-provider counts by district and quarter (ALL/ALL slice).
+CREATE TABLE IF NOT EXISTS provider_counts (
+    quarter TEXT, state TEXT, district TEXT, support_class TEXT,
+    provider_count INTEGER,
+    PRIMARY KEY (quarter, state, district, support_class)
+);
+CREATE INDEX IF NOT EXISTS idx_pc_dist ON provider_counts(district);
+
+-- Market concentration: top-10 payment share + payment band by district/support.
+CREATE TABLE IF NOT EXISTS market_concentration (
+    quarter TEXT, state TEXT, district TEXT, support_class TEXT,
+    top10_share REAL, payment_low REAL, payment_high REAL,
+    PRIMARY KEY (quarter, state, district, support_class)
+);
+
+-- Shared-address entity clusters (ring detection over held ABR records).
+CREATE TABLE IF NOT EXISTS rings (
+    ring_id TEXT PRIMARY KEY, address_key TEXT, state TEXT, postcode TEXT,
+    abn_count INTEGER, sanctioned_count INTEGER, abns TEXT, score REAL
+);
 """
 
 

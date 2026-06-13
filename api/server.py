@@ -161,6 +161,25 @@ def money():
     return summary()
 
 
+@app.get("/api/signals")
+def signals():
+    from app.region_risk import compute
+    from app.rings import family_clusters, multi_abn_operators
+    c = db()
+    regions = compute(c)
+    nat = rows(c.execute("SELECT provider_count c, quarter FROM provider_counts "
+                         "WHERE state='ALL' AND district='ALL' AND support_class='ALL' "
+                         "ORDER BY quarter"))
+    return {
+        "regions": regions,
+        "national_growth": (regions and round(
+            (nat[-1]["c"] / nat[0]["c"] - 1) * 100, 1)) if nat else 0,
+        "national_series": nat,
+        "operators": multi_abn_operators(c, 3),
+        "families": family_clusters(c),
+    }
+
+
 @app.get("/api/claims-demo")
 def claims_demo():
     return _screen(ROOT / "data" / "synthetic_invoices.csv")
